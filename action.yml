@@ -1,11 +1,29 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'CargoVersionBump'
+description: 'Bump version of a Rust Cargo based project.'
+author: 'Yuri6037'
 inputs:
-  milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  major:
+    required: false
+    description: 'Bump the major version number'
+    default: false
+  minor:
+    required: false
+    description: 'Bump the minor version number'
+    default: false
+  patch:
+    required: false
+    description: 'Bump the patch version number'
+    default: false
+  cwd:
+    required: false
+    description: 'Working directory of Cargo.toml'
+    default: '.'
+  pre-release-channel:
+    required: false
+    description: 'What pre-release channel should this version be'
+    default: null
+outputs:
+
 runs:
   using: 'node16'
   main: 'dist/index.js'
