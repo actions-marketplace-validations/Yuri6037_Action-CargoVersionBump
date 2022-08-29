@@ -22,8 +22,7 @@ inputs:
     required: false
     description: 'What pre-release channel should this version be'
     default: null
-outputs:
-
+#outputs:
 runs:
   using: 'node16'
   main: 'dist/index.js'
