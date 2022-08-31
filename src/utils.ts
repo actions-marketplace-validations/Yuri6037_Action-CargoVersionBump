@@ -86,6 +86,7 @@ export class Version {
     private core: VersionNumber
     private channel: string | null
     private preRelease: VersionNumber | null
+    private lock: boolean
 
     constructor(
         core: VersionNumber,
@@ -95,11 +96,18 @@ export class Version {
         this.core = core
         this.channel = channel
         this.preRelease = preRelease
+        this.lock = false
     }
 
-    jumpChannel(channel: string) {
+    jumpChannel(channel: string | null) {
         if (this.channel) {
-            this.channel = channel
+            if (channel) {
+                this.channel = channel
+            } else {
+                this.channel = null
+                this.preRelease = null
+                this.lock = true
+            }
         } else {
             this.channel = channel
             this.preRelease = null
@@ -114,7 +122,7 @@ export class Version {
                 this.core.minor += 1
                 this.preRelease = { minor: 1, major: 0, patch: 0 }
             }
-        } else {
+        } else if (!this.lock) {
             this.core.minor += 1
         }
     }
@@ -127,7 +135,7 @@ export class Version {
                 this.core.major += 1
                 this.preRelease = { minor: 0, major: 1, patch: 0 }
             }
-        } else {
+        } else if (!this.lock) {
             this.core.major += 1
         }
     }
@@ -140,14 +148,14 @@ export class Version {
                 this.core.patch += 1
                 this.preRelease = { minor: 0, major: 0, patch: 1 }
             }
-        } else {
+        } else if (!this.lock) {
             this.core.patch += 1
         }
     }
 
     format(): string {
         if (this.channel) {
-            return `${this.core.major}.${this.core.minor}.${this.core.patch}-${this.channel}-${this.preRelease?.major}.${this.preRelease?.minor}.${this.preRelease?.patch}`
+            return `${this.core.major}.${this.core.minor}.${this.core.patch}-${this.channel}.${this.preRelease?.major}.${this.preRelease?.minor}.${this.preRelease?.patch}`
         } else {
             return `${this.core.major}.${this.core.minor}.${this.core.patch}`
         }

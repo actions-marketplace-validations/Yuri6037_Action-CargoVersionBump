@@ -18,7 +18,7 @@ export async function bumpVersion(
 ): Promise<VersionBumpsResult> {
     const project = await loadCargo(path)
     const version = parseVersion(project.version)
-    if (channel) version.jumpChannel(channel)
+    version.jumpChannel(channel)
     if (bumps.major) version.bumpMajor()
     if (bumps.minor) version.bumpMinor()
     if (bumps.patch) version.bumpPatch()
