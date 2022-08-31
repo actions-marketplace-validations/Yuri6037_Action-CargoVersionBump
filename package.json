@@ -26,8 +26,9 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.6.0",
-    "semver": "^7.3.7",
-    "toml": "^3.0.0"
+    "async-line-reader": "^1.0.0",
+    "line-replace": "^2.0.1",
+    "semver": "^7.3.7"
   },
   "devDependencies": {
     "@types/node": "^16.10.5",

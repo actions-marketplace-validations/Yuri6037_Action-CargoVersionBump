@@ -22,7 +22,11 @@ inputs:
     required: false
     description: 'What pre-release channel should this version be'
     default: null
-#outputs:
+outputs:
+  release-name:
+    description: Name of released package
+  release-version:
+    description: Updated version of released package
 runs:
   using: 'node16'
   main: 'dist/index.js'

@@ -2,11 +2,42 @@
 /* eslint-disable github/no-then */
 import * as fs from 'fs'
 import { parse } from 'semver'
-import * as toml from 'toml'
+import lineReplace from 'line-replace'
+import { AsyncLineReader } from 'async-line-reader'
+
+function asyncLineReplace(
+    file: string,
+    line: number,
+    text: string,
+    addNewLine: boolean
+): Promise<{ file: string; line: number; text: string; replacedText: string }> {
+    return new Promise((resolve, reject) => {
+        lineReplace(
+            file,
+            line,
+            text,
+            addNewLine,
+            function (par0, par1, par2, par3, par4) {
+                //stupid shallow rule thing forces naming with 'parN'
+                if (par4) {
+                    reject(par4)
+                } else {
+                    resolve({
+                        file: par0,
+                        line: par1,
+                        text: par2,
+                        replacedText: par3
+                    })
+                }
+            }
+        )
+    })
+}
 
 export interface Cargo {
     name: string
     version: string
+    versionLineId: number
 }
 
 export function exists(path: string): Promise<boolean> {
@@ -17,8 +48,32 @@ export function exists(path: string): Promise<boolean> {
 }
 
 export async function loadCargo(path: string): Promise<Cargo> {
-    const text = await fs.promises.readFile(path, 'utf8')
-    return toml.parse(text)
+    const result = {
+        name: '',
+        version: '',
+        versionLineId: 0
+    }
+    const stream = fs.createReadStream(path, 'utf8')
+    const reader = new AsyncLineReader(stream)
+    const nameRegex = /name = "(.+)"/gm
+    const versionRegex = /version = "([0-9]+.[0-9]+.[0-9]+(-.+)?)"/gm
+    let line
+    let lineId = 0
+    while ((line = await reader.readLine())) {
+        lineId += 1
+        const name = line.match(nameRegex)
+        const version = line.match(versionRegex)
+        if (name) result.name = name[1]
+        if (version) {
+            result.version = version[1]
+            result.versionLineId = lineId
+        }
+    }
+    return result
+}
+
+export async function saveCargo(path: string, project: Cargo): Promise<void> {
+    await asyncLineReplace(path, project.versionLineId, project.version, false)
 }
 
 interface VersionNumber {
