@@ -13,12 +13,12 @@ export interface VersionBumps {
 
 export async function bumpVersion(
     path: string,
-    channel: string,
+    channel: string | null,
     bumps: VersionBumps
 ): Promise<VersionBumpsResult> {
     const project = await loadCargo(path)
     const version = parseVersion(project.version)
-    version.jumpChannel(channel)
+    if (channel) version.jumpChannel(channel)
     if (bumps.major) version.bumpMajor()
     if (bumps.minor) version.bumpMinor()
     if (bumps.patch) version.bumpPatch()
