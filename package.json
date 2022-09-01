@@ -1,9 +1,9 @@
 {
-  "name": "typescript-action",
+  "name": "cargo-version-bump",
   "version": "0.0.0",
   "private": true,
   "description": "TypeScript template action",
-  "main": "lib/main.js",
+  "main": "lib/src/main.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/Yuri6037/Action-CargoVersionBump.git"
   },
   "keywords": [
     "actions",
