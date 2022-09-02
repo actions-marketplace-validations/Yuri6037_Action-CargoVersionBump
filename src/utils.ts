@@ -55,8 +55,8 @@ export async function loadCargo(path: string): Promise<Cargo> {
     }
     const stream = fs.createReadStream(path, 'utf8')
     const reader = new AsyncLineReader(stream)
-    const nameRegex = /name = "(.+)"/gm
-    const versionRegex = /version = "([0-9]+.[0-9]+.[0-9]+(-.+)?)"/gm
+    const nameRegex = /name = "(.+)"/
+    const versionRegex = /version = "([0-9]+.[0-9]+.[0-9]+(-.+)?)"/
     let line
     let lineId = 0
     while ((line = await reader.readLine())) {
@@ -68,6 +68,8 @@ export async function loadCargo(path: string): Promise<Cargo> {
             result.version = version[1]
             result.versionLineId = lineId
         }
+        //If all inormation was retrieved stop to avoid further iterations
+        if (result.name && result.version) break
     }
     return result
 }
