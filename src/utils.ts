@@ -4,6 +4,7 @@ import * as fs from 'fs'
 import { parse } from 'semver'
 import lineReplace from 'line-replace'
 import { AsyncLineReader } from 'async-line-reader'
+import { Version } from './version'
 
 function asyncLineReplace(
     file: string,
@@ -12,12 +13,14 @@ function asyncLineReplace(
     addNewLine: boolean
 ): Promise<{ file: string; line: number; text: string; replacedText: string }> {
     return new Promise((resolve, reject) => {
-        lineReplace(
+        lineReplace({
             file,
             line,
             text,
             addNewLine,
-            function (par0, par1, par2, par3, par4) {
+            //It's impossible to do any other way arround due to the poor broken architecture of the lib!
+            // eslint-disable-next-line object-shorthand
+            callback: function (par0, par1, par2, par3, par4) {
                 //stupid shallow rule thing forces naming with 'parN'
                 if (par4) {
                     reject(par4)
@@ -30,7 +33,7 @@ function asyncLineReplace(
                     })
                 }
             }
-        )
+        })
     })
 }
 
@@ -76,92 +79,6 @@ export async function loadCargo(path: string): Promise<Cargo> {
 
 export async function saveCargo(path: string, project: Cargo): Promise<void> {
     await asyncLineReplace(path, project.versionLineId, project.version, false)
-}
-
-interface VersionNumber {
-    minor: number
-    major: number
-    patch: number
-}
-
-export class Version {
-    private core: VersionNumber
-    private channel: string | null
-    private preRelease: VersionNumber | null
-    private lock: boolean
-
-    constructor(
-        core: VersionNumber,
-        channel: string | null,
-        preRelease: VersionNumber | null
-    ) {
-        this.core = core
-        this.channel = channel
-        this.preRelease = preRelease
-        this.lock = false
-    }
-
-    jumpChannel(channel: string | null) {
-        if (this.channel) {
-            if (channel) {
-                this.channel = channel
-            } else {
-                this.channel = null
-                this.preRelease = null
-                this.lock = true
-            }
-        } else {
-            this.channel = channel
-            this.preRelease = null
-        }
-    }
-
-    bumpMinor() {
-        if (this.channel) {
-            if (this.preRelease) {
-                this.preRelease.minor += 1
-            } else {
-                this.core.minor += 1
-                this.preRelease = { minor: 1, major: 0, patch: 0 }
-            }
-        } else if (!this.lock) {
-            this.core.minor += 1
-        }
-    }
-
-    bumpMajor() {
-        if (this.channel) {
-            if (this.preRelease) {
-                this.preRelease.major += 1
-            } else {
-                this.core.major += 1
-                this.preRelease = { minor: 0, major: 1, patch: 0 }
-            }
-        } else if (!this.lock) {
-            this.core.major += 1
-        }
-    }
-
-    bumpPatch() {
-        if (this.channel) {
-            if (this.preRelease) {
-                this.preRelease.patch += 1
-            } else {
-                this.core.patch += 1
-                this.preRelease = { minor: 0, major: 0, patch: 1 }
-            }
-        } else if (!this.lock) {
-            this.core.patch += 1
-        }
-    }
-
-    format(): string {
-        if (this.channel) {
-            return `${this.core.major}.${this.core.minor}.${this.core.patch}-${this.channel}.${this.preRelease?.major}.${this.preRelease?.minor}.${this.preRelease?.patch}`
-        } else {
-            return `${this.core.major}.${this.core.minor}.${this.core.patch}`
-        }
-    }
 }
 
 export function parseVersion(version: string): Version {

@@ -13,14 +13,14 @@ test('parse_version_pre_major', async () => {
     const version = parseVersion('1.0.0-pre.0.0.1')
     version.jumpChannel('pre')
     version.bumpMajor()
-    expect(version.format()).toEqual('1.0.0-pre.1.0.1')
+    expect(version.format()).toEqual('1.0.0-pre.1.0.0')
 })
 
 test('parse_version_pre_minor', async () => {
     const version = parseVersion('1.0.0-pre.0.0.1')
     version.jumpChannel('pre')
     version.bumpMinor()
-    expect(version.format()).toEqual('1.0.0-pre.0.1.1')
+    expect(version.format()).toEqual('1.0.0-pre.0.1.0')
 })
 
 test('parse_version_pre_patch', async () => {

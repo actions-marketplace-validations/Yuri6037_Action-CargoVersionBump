@@ -1,10 +1,10 @@
-/* eslint-disable no-shadow */
 declare module 'line-replace' {
-    function lineReplace(
-        file: string,
-        line: number,
-        text: string,
-        addNewLine: boolean,
+    //The doc on github is actualy broken, the lib uses a table!
+    interface Params {
+        file: string
+        line: number
+        text: string
+        addNewLine: boolean
         callback: (
             file: string,
             line: number,
@@ -12,6 +12,8 @@ declare module 'line-replace' {
             replacedText: string,
             error: Error
         ) => void
-    ): void
+    }
+
+    function lineReplace(params: Params): void
     export = lineReplace
 }

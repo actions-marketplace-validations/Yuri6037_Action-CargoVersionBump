@@ -148,27 +148,36 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseVersion = exports.Version = exports.saveCargo = exports.loadCargo = exports.exists = void 0;
+exports.parseVersion = exports.saveCargo = exports.loadCargo = exports.exists = void 0;
 /* eslint-disable @typescript-eslint/promise-function-async */
 /* eslint-disable github/no-then */
 const fs = __importStar(__nccwpck_require__(5747));
 const semver_1 = __nccwpck_require__(1383);
 const line_replace_1 = __importDefault(__nccwpck_require__(8289));
 const async_line_reader_1 = __nccwpck_require__(8764);
+const version_1 = __nccwpck_require__(3291);
 function asyncLineReplace(file, line, text, addNewLine) {
     return new Promise((resolve, reject) => {
-        (0, line_replace_1.default)(file, line, text, addNewLine, function (par0, par1, par2, par3, par4) {
-            //stupid shallow rule thing forces naming with 'parN'
-            if (par4) {
-                reject(par4);
-            }
-            else {
-                resolve({
-                    file: par0,
-                    line: par1,
-                    text: par2,
-                    replacedText: par3
-                });
+        (0, line_replace_1.default)({
+            file,
+            line,
+            text,
+            addNewLine,
+            //It's impossible to do any other way arround due to the poor broken architecture of the lib!
+            // eslint-disable-next-line object-shorthand
+            callback: function (par0, par1, par2, par3, par4) {
+                //stupid shallow rule thing forces naming with 'parN'
+                if (par4) {
+                    reject(par4);
+                }
+                else {
+                    resolve({
+                        file: par0,
+                        line: par1,
+                        text: par2,
+                        replacedText: par3
+                    });
+                }
             }
         });
     });
@@ -217,6 +226,40 @@ function saveCargo(path, project) {
     });
 }
 exports.saveCargo = saveCargo;
+function parseVersion(version) {
+    const v = (0, semver_1.parse)(version);
+    if (!v)
+        throw new EvalError('Could not parse semver version');
+    const core = { minor: v.minor, major: v.major, patch: v.patch };
+    if (v.prerelease.length === 0)
+        return new version_1.Version(core, null, null);
+    if (v.prerelease.length !== 4)
+        throw new EvalError('Could not parse pre-release version information');
+    let channel = v.prerelease[0].toString();
+    const major = v.prerelease[1];
+    const minor = v.prerelease[2];
+    const patch = v.prerelease[3];
+    if (channel.endsWith('-'))
+        channel = channel.substring(0, channel.length - 1);
+    if (typeof minor != 'number' ||
+        typeof major != 'number' ||
+        typeof patch != 'number')
+        throw new EvalError('Could not parse pre-release version information');
+    const preRelease = { minor, major, patch };
+    return new version_1.Version(core, channel, preRelease);
+}
+exports.parseVersion = parseVersion;
+
+
+/***/ }),
+
+/***/ 3291:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Version = void 0;
 class Version {
     constructor(core, channel, preRelease) {
         this.core = core;
@@ -243,6 +286,7 @@ class Version {
     bumpMinor() {
         if (this.channel) {
             if (this.preRelease) {
+                this.preRelease.patch = 0;
                 this.preRelease.minor += 1;
             }
             else {
@@ -251,12 +295,15 @@ class Version {
             }
         }
         else if (!this.lock) {
+            this.core.patch = 0;
             this.core.minor += 1;
         }
     }
     bumpMajor() {
         if (this.channel) {
             if (this.preRelease) {
+                this.preRelease.minor = 0;
+                this.preRelease.patch = 0;
                 this.preRelease.major += 1;
             }
             else {
@@ -265,6 +312,8 @@ class Version {
             }
         }
         else if (!this.lock) {
+            this.core.minor = 0;
+            this.core.patch = 0;
             this.core.major += 1;
         }
     }
@@ -293,29 +342,6 @@ class Version {
     }
 }
 exports.Version = Version;
-function parseVersion(version) {
-    const v = (0, semver_1.parse)(version);
-    if (!v)
-        throw new EvalError('Could not parse semver version');
-    const core = { minor: v.minor, major: v.major, patch: v.patch };
-    if (v.prerelease.length === 0)
-        return new Version(core, null, null);
-    if (v.prerelease.length !== 4)
-        throw new EvalError('Could not parse pre-release version information');
-    let channel = v.prerelease[0].toString();
-    const major = v.prerelease[1];
-    const minor = v.prerelease[2];
-    const patch = v.prerelease[3];
-    if (channel.endsWith('-'))
-        channel = channel.substring(0, channel.length - 1);
-    if (typeof minor != 'number' ||
-        typeof major != 'number' ||
-        typeof patch != 'number')
-        throw new EvalError('Could not parse pre-release version information');
-    const preRelease = { minor, major, patch };
-    return new Version(core, channel, preRelease);
-}
-exports.parseVersion = parseVersion;
 
 
 /***/ }),
