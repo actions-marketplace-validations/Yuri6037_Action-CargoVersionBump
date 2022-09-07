@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
 /* eslint-disable github/no-then */
 import * as fs from 'fs'
-import { parse } from 'semver'
+import { parse, SemVer } from 'semver'
 import lineReplace from 'line-replace'
 import { AsyncLineReader } from 'async-line-reader'
-import { Version } from './version'
 
 function asyncLineReplace(
     file: string,
@@ -81,25 +80,8 @@ export async function saveCargo(path: string, project: Cargo): Promise<void> {
     await asyncLineReplace(path, project.versionLineId, project.version, false)
 }
 
-export function parseVersion(version: string): Version {
+export function parseVersion(version: string): SemVer {
     const v = parse(version)
     if (!v) throw new EvalError('Could not parse semver version')
-    const core = { minor: v.minor, major: v.major, patch: v.patch }
-    if (v.prerelease.length === 0) return new Version(core, null, null)
-    if (v.prerelease.length !== 4)
-        throw new EvalError('Could not parse pre-release version information')
-    let channel = v.prerelease[0].toString()
-    const major = v.prerelease[1]
-    const minor = v.prerelease[2]
-    const patch = v.prerelease[3]
-    if (channel.endsWith('-'))
-        channel = channel.substring(0, channel.length - 1)
-    if (
-        typeof minor != 'number' ||
-        typeof major != 'number' ||
-        typeof patch != 'number'
-    )
-        throw new EvalError('Could not parse pre-release version information')
-    const preRelease = { minor, major, patch }
-    return new Version(core, channel, preRelease)
+    return v
 }

@@ -2,31 +2,30 @@ name: 'CargoVersionBump'
 description: 'Bump version of a Rust Cargo based project.'
 author: 'Yuri6037'
 inputs:
-  major:
+  mode:
     required: false
-    description: 'Bump the major version number'
-    default: false
-  minor:
+    description: 'get to return current crate name and version, set to check and apply the new provided version if it is greater than the current one'
+    default: 'get'
+  release-branch:
     required: false
-    description: 'Bump the minor version number'
-    default: false
-  patch:
+    description: 'name of the release branch'
+    default: null
+  multi:
     required: false
-    description: 'Bump the patch version number'
+    description: 'set to true if the repository has multiple Cargo crates, in which case multiple /version can be used, each with the directory name as second argument'
     default: false
+  token:
+    required: true
+    description: 'the GitHub Actions token'
   cwd:
     required: false
-    description: 'Working directory of Cargo.toml'
+    description: 'working directory of Cargo.toml'
     default: '.'
-  pre-release-channel:
-    required: false
-    description: 'What pre-release channel should this version be'
-    default: null
 outputs:
-  release-name:
-    description: Name of released package
-  release-version:
-    description: Updated version of released package
+  name:
+    description: 'crate name'
+  version:
+    description: 'crate version'
 runs:
   using: 'node16'
   main: 'dist/index.js'
