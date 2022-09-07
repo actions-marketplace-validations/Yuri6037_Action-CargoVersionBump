@@ -1,10 +1,16 @@
-import { Cargo, loadCargo, parseVersion } from './utils'
+import {
+    Cargo,
+    getLatestCratesIoVersion,
+    loadCargo,
+    parseVersion
+} from './utils'
 import { context } from '@actions/github'
 import path from 'path'
 
 export interface Project {
     version: string
     name: string
+    isNew: boolean
 }
 
 export interface VersionPatch {
@@ -21,9 +27,13 @@ export interface Result {
 
 export async function get(path1: string): Promise<Project> {
     const project = await loadCargo(path1)
+    const latest = await getLatestCratesIoVersion(project.name)
+    const isNew =
+        latest !== null && parseVersion(project.version).compare(latest) === 1
     return {
         name: project.name,
-        version: project.version
+        version: project.version,
+        isNew
     }
 }
 

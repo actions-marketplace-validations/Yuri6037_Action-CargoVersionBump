@@ -4,6 +4,7 @@ import * as fs from 'fs'
 import { parse, SemVer } from 'semver'
 import lineReplace from 'line-replace'
 import { AsyncLineReader } from 'async-line-reader'
+import axios from 'axios'
 
 function asyncLineReplace(
     file: string,
@@ -84,4 +85,25 @@ export function parseVersion(version: string): SemVer {
     const v = parse(version)
     if (!v) throw new EvalError('Could not parse semver version')
     return v
+}
+
+interface CratesIo {
+    versions: { num: string; yanked: boolean }[]
+}
+
+export async function getLatestCratesIoVersion(
+    name: string
+): Promise<string | null> {
+    try {
+        const response = await axios.get<CratesIo>(
+            `https://crates.io/${name}/versions`
+        )
+        const versions = response.data.versions.filter(v => !v.yanked)
+        if (versions.length > 0) {
+            return versions[0].num
+        }
+        return null
+    } catch (_) {
+        return null
+    }
 }
