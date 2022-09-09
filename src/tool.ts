@@ -6,6 +6,8 @@ import {
 } from './utils'
 import { context } from '@actions/github'
 import path from 'path'
+// eslint-disable-next-line import/no-unresolved
+import { IssueCommentEvent } from '@octokit/webhooks-definitions/schema'
 
 export interface Project {
     version: string
@@ -19,7 +21,6 @@ export interface VersionPatch {
 }
 
 export interface Result {
-    pr_id: number
     comment_id: number
     array?: VersionPatch[]
     error?: string
@@ -54,14 +55,14 @@ export async function patchVersion(
 }
 
 export async function set(path1: string, multi: boolean): Promise<Result> {
-    const id = context.payload.pull_request?.number
+    const ctx = context.payload as IssueCommentEvent
+    const id = ctx.issue.number
     if (!id) throw new EvalError('No pull request found in the context')
-    const comment = context.payload.comment
+    const comment = ctx.comment
     if (!comment)
         throw new EvalError('No pull request comment found in the context')
-    const body = comment.body as string
+    const body = comment.body
     const output: Result = {
-        pr_id: id,
         comment_id: comment.id
     }
     if (multi) {
