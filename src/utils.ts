@@ -5,6 +5,10 @@ import { parse, SemVer } from 'semver'
 import lineReplace from 'line-replace'
 import { AsyncLineReader } from 'async-line-reader'
 import axios from 'axios'
+// eslint-disable-next-line import/no-unresolved
+import { IssueCommentEvent } from '@octokit/webhooks-definitions/schema'
+import { context } from '@actions/github'
+import { GitHub } from '@actions/github/lib/utils'
 
 function asyncLineReplace(
     file: string,
@@ -105,5 +109,30 @@ export async function getLatestCratesIoVersion(
         return null
     } catch (_) {
         return null
+    }
+}
+
+export interface PullRequest {
+    targetBranch: string
+    sourceBranch: string
+    number: number
+}
+
+export async function getPullRequest(
+    kit: InstanceType<typeof GitHub>
+): Promise<PullRequest> {
+    const ctx = context.payload as IssueCommentEvent
+    const id = ctx.issue.number
+    const pr = await kit.rest.pulls.get({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        pull_number: id
+    })
+    if (pr.status !== 200)
+        throw new EvalError('The context is not associated to a Pull Request')
+    return {
+        targetBranch: pr.data.base.ref,
+        sourceBranch: pr.data.head.ref,
+        number: pr.data.number
     }
 }
