@@ -67,8 +67,15 @@ function run() {
                 if (branch)
                     yield (0, exec_1.exec)('git', ['checkout', branch]);
                 const res = yield (0, tool_1.set)(cargo, multi);
-                if (branch)
+                if (branch) {
+                    yield (0, exec_1.exec)('git', [
+                        'fetch',
+                        'origin',
+                        pr.sourceBranch,
+                        `--depth=${(pr.commits + 1).toString()}`
+                    ]);
                     yield (0, exec_1.exec)('git', ['checkout', pr.sourceBranch]);
+                }
                 const ctx = github_1.context.payload;
                 if (res.error) {
                     yield github.rest.issues.createComment({
@@ -372,7 +379,8 @@ function getPullRequest(kit) {
         return {
             targetBranch: pr.data.base.ref,
             sourceBranch: pr.data.head.ref,
-            number: pr.data.number
+            number: pr.data.number,
+            commits: pr.data.commits
         };
     });
 }

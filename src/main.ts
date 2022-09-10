@@ -27,7 +27,15 @@ async function run(): Promise<void> {
             const pr = await getPullRequest(github)
             if (branch) await exec('git', ['checkout', branch])
             const res = await set(cargo, multi)
-            if (branch) await exec('git', ['checkout', pr.sourceBranch])
+            if (branch) {
+                await exec('git', [
+                    'fetch',
+                    'origin',
+                    pr.sourceBranch,
+                    `--depth=${(pr.commits + 1).toString()}`
+                ])
+                await exec('git', ['checkout', pr.sourceBranch])
+            }
             const ctx = context.payload as IssueCommentEvent
             if (res.error) {
                 await github.rest.issues.createComment({

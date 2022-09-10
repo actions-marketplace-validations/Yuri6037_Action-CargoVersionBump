@@ -116,6 +116,7 @@ export interface PullRequest {
     targetBranch: string
     sourceBranch: string
     number: number
+    commits: number
 }
 
 export async function getPullRequest(
@@ -133,6 +134,7 @@ export async function getPullRequest(
     return {
         targetBranch: pr.data.base.ref,
         sourceBranch: pr.data.head.ref,
-        number: pr.data.number
+        number: pr.data.number,
+        commits: pr.data.commits
     }
 }
