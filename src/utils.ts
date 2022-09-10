@@ -6,7 +6,7 @@ import lineReplace from 'line-replace'
 import { AsyncLineReader } from 'async-line-reader'
 import axios from 'axios'
 // eslint-disable-next-line import/no-unresolved
-import { IssueCommentEvent } from '@octokit/webhooks-definitions/schema'
+import { IssueCommentEvent } from '@octokit/webhooks-types'
 import { context } from '@actions/github'
 import { GitHub } from '@actions/github/lib/utils'
 

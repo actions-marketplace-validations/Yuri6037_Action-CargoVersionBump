@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import { exec } from '@actions/exec'
 import { getOctokit, context } from '@actions/github'
 // eslint-disable-next-line import/no-unresolved
-import { IssueCommentEvent } from '@octokit/webhooks-definitions/schema'
+import { IssueCommentEvent } from '@octokit/webhooks-types'
 import path from 'path'
 import { get, set } from './tool'
 import { getPullRequest, saveCargo } from './utils'
