@@ -82,7 +82,12 @@ export async function loadCargo(path: string): Promise<Cargo> {
 }
 
 export async function saveCargo(path: string, project: Cargo): Promise<void> {
-    await asyncLineReplace(path, project.versionLineId, project.version, false)
+    await asyncLineReplace(
+        path,
+        project.versionLineId,
+        `version = "${project.version}"\n`,
+        false
+    )
 }
 
 export function parseVersion(version: string): SemVer {

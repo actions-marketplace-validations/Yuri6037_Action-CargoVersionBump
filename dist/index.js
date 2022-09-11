@@ -337,7 +337,7 @@ function loadCargo(path) {
 exports.loadCargo = loadCargo;
 function saveCargo(path, project) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield asyncLineReplace(path, project.versionLineId, project.version, false);
+        yield asyncLineReplace(path, project.versionLineId, `version = "${project.version}"\n`, false);
     });
 }
 exports.saveCargo = saveCargo;
