@@ -1,8 +1,6 @@
 import * as core from '@actions/core'
 import { exec } from '@actions/exec'
 import { getOctokit, context } from '@actions/github'
-// eslint-disable-next-line import/no-unresolved
-import { IssueCommentEvent } from '@octokit/webhooks-definitions/schema'
 import path from 'path'
 import { get, set } from './tool'
 import { getPullRequest, saveCargo } from './utils'
@@ -28,7 +26,6 @@ async function run(): Promise<void> {
             if (branch) await exec('git', ['checkout', branch])
             const res = await set(cargo, multi)
             if (branch) await exec('git', ['checkout', pr.sourceBranch])
-            const ctx = context.payload as IssueCommentEvent
             if (res.error) {
                 await github.rest.issues.createComment({
                     owner: context.repo.owner,
@@ -42,8 +39,8 @@ async function run(): Promise<void> {
                     await saveCargo(item.path, item.project)
                 }
                 await github.rest.reactions.createForIssueComment({
-                    owner: context.actor,
-                    repo: ctx.repository.name,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
                     comment_id: res.comment_id,
                     content: 'rocket'
                 })

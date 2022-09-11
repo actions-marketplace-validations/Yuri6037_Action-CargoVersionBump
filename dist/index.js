@@ -69,7 +69,6 @@ function run() {
                 const res = yield (0, tool_1.set)(cargo, multi);
                 if (branch)
                     yield (0, exec_1.exec)('git', ['checkout', pr.sourceBranch]);
-                const ctx = github_1.context.payload;
                 if (res.error) {
                     yield github.rest.issues.createComment({
                         owner: github_1.context.repo.owner,
@@ -83,8 +82,8 @@ function run() {
                         yield (0, utils_1.saveCargo)(item.path, item.project);
                     }
                     yield github.rest.reactions.createForIssueComment({
-                        owner: github_1.context.actor,
-                        repo: ctx.repository.name,
+                        owner: github_1.context.repo.owner,
+                        repo: github_1.context.repo.repo,
                         comment_id: res.comment_id,
                         content: 'rocket'
                     });
