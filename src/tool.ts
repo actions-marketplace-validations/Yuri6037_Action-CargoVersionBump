@@ -7,7 +7,7 @@ import {
 import { context } from '@actions/github'
 import path from 'path'
 // eslint-disable-next-line import/no-unresolved
-import { IssueCommentEvent } from '@octokit/webhooks-definitions/schema'
+import { IssueCommentEvent } from '@octokit/webhooks-types'
 
 export interface Project {
     version: string
