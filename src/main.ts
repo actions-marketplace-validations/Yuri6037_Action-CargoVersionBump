@@ -52,6 +52,7 @@ async function run(): Promise<void> {
                     comment_id: res.comment_id,
                     content: 'rocket'
                 })
+                core.setOutput('branch', pr.sourceBranch)
             }
         }
     } catch (error) {

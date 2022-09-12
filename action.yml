@@ -28,6 +28,8 @@ outputs:
     description: 'crate version'
   is-new:
     description: 'true if the version is greater than the latest on crates.io'
+  branch:
+    description: 'the source branch of the Pull Request'
 runs:
   using: 'node16'
   main: 'dist/index.js'

@@ -94,6 +94,7 @@ function run() {
                         comment_id: res.comment_id,
                         content: 'rocket'
                     });
+                    core.setOutput('branch', pr.sourceBranch);
                 }
             }
         }
