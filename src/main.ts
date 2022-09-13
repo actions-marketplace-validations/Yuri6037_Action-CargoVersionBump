@@ -18,6 +18,7 @@ async function run(): Promise<void> {
             core.setOutput('name', res.name)
             core.setOutput('version', res.version)
             core.setOutput('is-new', res.isNew)
+            core.setOutput('is-pre', res.isPre)
         } else if (mode === 'set') {
             const github = getOctokit(core.getInput('token'))
             const multi = core.getBooleanInput('multi')

@@ -30,6 +30,8 @@ outputs:
     description: 'true if the version is greater than the latest on crates.io'
   branch:
     description: 'the source branch of the Pull Request'
+  is-pre:
+    description: 'the release is a pre-release'
 runs:
   using: 'node16'
   main: 'dist/index.js'
