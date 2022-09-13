@@ -58,6 +58,7 @@ function run() {
                 core.setOutput('name', res.name);
                 core.setOutput('version', res.version);
                 core.setOutput('is-new', res.isNew);
+                core.setOutput('is-pre', res.isPre);
             }
             else if (mode === 'set') {
                 const github = (0, github_1.getOctokit)(core.getInput('token'));
@@ -135,11 +136,13 @@ function get(path1) {
     return __awaiter(this, void 0, void 0, function* () {
         const project = yield (0, utils_1.loadCargo)(path1);
         const latest = yield (0, utils_1.getLatestCratesIoVersion)(project.name);
-        const isNew = latest !== null && (0, utils_1.parseVersion)(project.version).compare(latest) === 1;
+        const pversion = (0, utils_1.parseVersion)(project.version);
+        const isNew = latest !== null && pversion.compare(latest) === 1;
         return {
             name: project.name,
             version: project.version,
-            isNew
+            isNew,
+            isPre: pversion.prerelease.length > 0
         };
     });
 }
