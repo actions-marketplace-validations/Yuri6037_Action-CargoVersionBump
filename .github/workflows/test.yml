@@ -23,4 +23,4 @@ jobs:
           repository: 'Yuri6037/time-tz'
       - uses: Yuri6037/Action-CargoVersionBump@main
         with:
-          major: true
+          mode: get
