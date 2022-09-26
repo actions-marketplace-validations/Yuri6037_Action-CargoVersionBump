@@ -13,14 +13,14 @@ async function run(): Promise<void> {
             core.getInput('cwd'),
             'Cargo.toml'
         )
+        const github = getOctokit(core.getInput('token'))
         if (mode === 'get') {
-            const res = await get(cargo)
+            const res = await get(cargo, github)
             core.setOutput('name', res.name)
             core.setOutput('version', res.version)
             core.setOutput('is-new', res.isNew)
             core.setOutput('is-pre', res.isPre)
         } else if (mode === 'set') {
-            const github = getOctokit(core.getInput('token'))
             const multi = core.getBooleanInput('multi')
             const branch = core.getInput('release-branch')
             const pr = await getPullRequest(github)

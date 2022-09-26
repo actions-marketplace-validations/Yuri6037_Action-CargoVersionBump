@@ -1,6 +1,7 @@
 import {
     Cargo,
     getLatestCratesIoVersion,
+    ghReleaseTagExists,
     loadCargo,
     parseVersion
 } from './utils'
@@ -8,6 +9,7 @@ import { context } from '@actions/github'
 import path from 'path'
 // eslint-disable-next-line import/no-unresolved
 import { IssueCommentEvent } from '@octokit/webhooks-types'
+import { GitHub } from '@actions/github/lib/utils'
 
 export interface Project {
     version: string
@@ -27,11 +29,17 @@ export interface Result {
     error?: string
 }
 
-export async function get(path1: string): Promise<Project> {
+export async function get(
+    path1: string,
+    kit: InstanceType<typeof GitHub>
+): Promise<Project> {
     const project = await loadCargo(path1)
-    const latest = await getLatestCratesIoVersion(project.name)
     const pversion = parseVersion(project.version)
-    const isNew = latest !== null && pversion.compare(latest) === 1
+    let isNew = !(await ghReleaseTagExists(project.version, kit))
+    if (isNew) {
+        const latest = await getLatestCratesIoVersion(project.name)
+        isNew = latest !== null && pversion.compare(latest) === 1
+    }
     return {
         name: project.name,
         version: project.version,

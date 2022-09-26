@@ -117,6 +117,26 @@ export async function getLatestCratesIoVersion(
     }
 }
 
+export async function ghReleaseTagExists(
+    version: string,
+    kit: InstanceType<typeof GitHub>
+): Promise<boolean> {
+    try {
+        const req = await kit.request(
+            'GET /repos/{owner}/{repo}/releases/tags/{tag}',
+            {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag: version
+            }
+        )
+        if (req.status === 200) return true
+        else return false
+    } catch (_) {
+        return false
+    }
+}
+
 export interface PullRequest {
     targetBranch: string
     sourceBranch: string

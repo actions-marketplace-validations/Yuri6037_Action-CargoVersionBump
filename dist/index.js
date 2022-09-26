@@ -53,15 +53,15 @@ function run() {
         try {
             const mode = core.getInput('mode');
             const cargo = path_1.default.join(process.cwd(), core.getInput('cwd'), 'Cargo.toml');
+            const github = (0, github_1.getOctokit)(core.getInput('token'));
             if (mode === 'get') {
-                const res = yield (0, tool_1.get)(cargo);
+                const res = yield (0, tool_1.get)(cargo, github);
                 core.setOutput('name', res.name);
                 core.setOutput('version', res.version);
                 core.setOutput('is-new', res.isNew);
                 core.setOutput('is-pre', res.isPre);
             }
             else if (mode === 'set') {
-                const github = (0, github_1.getOctokit)(core.getInput('token'));
                 const multi = core.getBooleanInput('multi');
                 const branch = core.getInput('release-branch');
                 const pr = yield (0, utils_1.getPullRequest)(github);
@@ -132,12 +132,15 @@ exports.set = exports.patchVersion = exports.get = void 0;
 const utils_1 = __nccwpck_require__(7696);
 const github_1 = __nccwpck_require__(5438);
 const path_1 = __importDefault(__nccwpck_require__(1017));
-function get(path1) {
+function get(path1, kit) {
     return __awaiter(this, void 0, void 0, function* () {
         const project = yield (0, utils_1.loadCargo)(path1);
-        const latest = yield (0, utils_1.getLatestCratesIoVersion)(project.name);
         const pversion = (0, utils_1.parseVersion)(project.version);
-        const isNew = latest !== null && pversion.compare(latest) === 1;
+        let isNew = !(yield (0, utils_1.ghReleaseTagExists)(project.version, kit));
+        if (isNew) {
+            const latest = yield (0, utils_1.getLatestCratesIoVersion)(project.name);
+            isNew = latest !== null && pversion.compare(latest) === 1;
+        }
         return {
             name: project.name,
             version: project.version,
@@ -266,7 +269,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getPullRequest = exports.getLatestCratesIoVersion = exports.parseVersion = exports.saveCargo = exports.loadCargo = exports.exists = void 0;
+exports.getPullRequest = exports.ghReleaseTagExists = exports.getLatestCratesIoVersion = exports.parseVersion = exports.saveCargo = exports.loadCargo = exports.exists = void 0;
 /* eslint-disable @typescript-eslint/promise-function-async */
 /* eslint-disable github/no-then */
 const fs = __importStar(__nccwpck_require__(7147));
@@ -368,6 +371,25 @@ function getLatestCratesIoVersion(name) {
     });
 }
 exports.getLatestCratesIoVersion = getLatestCratesIoVersion;
+function ghReleaseTagExists(version, kit) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const req = yield kit.request('GET /repos/{owner}/{repo}/releases/tags/{tag}', {
+                owner: github_1.context.repo.owner,
+                repo: github_1.context.repo.repo,
+                tag: version
+            });
+            if (req.status === 200)
+                return true;
+            else
+                return false;
+        }
+        catch (_) {
+            return false;
+        }
+    });
+}
+exports.ghReleaseTagExists = ghReleaseTagExists;
 function getPullRequest(kit) {
     return __awaiter(this, void 0, void 0, function* () {
         const ctx = github_1.context.payload;
