@@ -24,3 +24,4 @@ jobs:
       - uses: Yuri6037/Action-CargoVersionBump@main
         with:
           mode: get
+          token: ${{ secrets.GITHUB_TOKEN }}
