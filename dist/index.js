@@ -374,7 +374,7 @@ exports.getLatestCratesIoVersion = getLatestCratesIoVersion;
 function ghReleaseTagExists(version, kit) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const req = yield kit.request('GET /repos/{owner}/{repo}/releases/tags/{tag}', {
+            const req = yield kit.rest.repos.getReleaseByTag({
                 owner: github_1.context.repo.owner,
                 repo: github_1.context.repo.repo,
                 tag: version
