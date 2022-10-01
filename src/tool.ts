@@ -38,7 +38,8 @@ export async function get(
     let isNew = !(await ghReleaseTagExists(project.version, kit))
     if (isNew) {
         const latest = await getLatestCratesIoVersion(project.name)
-        isNew = latest !== null && pversion.compare(latest) === 1
+        if (!latest) isNew = true
+        else isNew = pversion.compare(latest) === 1
     }
     return {
         name: project.name,

@@ -139,7 +139,10 @@ function get(path1, kit) {
         let isNew = !(yield (0, utils_1.ghReleaseTagExists)(project.version, kit));
         if (isNew) {
             const latest = yield (0, utils_1.getLatestCratesIoVersion)(project.name);
-            isNew = latest !== null && pversion.compare(latest) === 1;
+            if (!latest)
+                isNew = true;
+            else
+                isNew = pversion.compare(latest) === 1;
         }
         return {
             name: project.name,
