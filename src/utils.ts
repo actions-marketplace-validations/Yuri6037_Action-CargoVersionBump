@@ -9,6 +9,7 @@ import axios from 'axios'
 import { IssueCommentEvent } from '@octokit/webhooks-types'
 import { context } from '@actions/github'
 import { GitHub } from '@actions/github/lib/utils'
+import * as core from '@actions/core'
 
 function asyncLineReplace(
     file: string,
@@ -121,17 +122,23 @@ export async function ghReleaseTagExists(
     version: string,
     kit: InstanceType<typeof GitHub>
 ): Promise<boolean> {
-    //try {
-    const req = await kit.rest.repos.getReleaseByTag({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        tag: version
-    })
-    if (req.status === 200) return true
-    else return false
-    /*} catch (_) {
+    try {
+        core.debug('==> ghReleaseTagExists - begin <==')
+        core.debug(`Repository owner: ${context.repo.owner}`)
+        core.debug(`Repository name: ${context.repo.repo}`)
+        core.debug(`Version tag: ${version}`)
+        const req = await kit.rest.repos.getReleaseByTag({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            tag: version
+        })
+        core.debug(`Request status: ${req.status}`)
+        core.debug('==> ghReleaseTagExists - end <==')
+        if (req.status === 200) return true
+        else return false
+    } catch (_) {
         return false
-    }*/
+    }
 }
 
 export interface PullRequest {

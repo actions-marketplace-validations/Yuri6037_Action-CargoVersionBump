@@ -278,6 +278,7 @@ const line_replace_1 = __importDefault(__nccwpck_require__(8289));
 const async_line_reader_1 = __nccwpck_require__(8764);
 const axios_1 = __importDefault(__nccwpck_require__(6545));
 const github_1 = __nccwpck_require__(5438);
+const core = __importStar(__nccwpck_require__(2186));
 function asyncLineReplace(file, line, text, addNewLine) {
     return new Promise((resolve, reject) => {
         (0, line_replace_1.default)({
@@ -373,19 +374,26 @@ function getLatestCratesIoVersion(name) {
 exports.getLatestCratesIoVersion = getLatestCratesIoVersion;
 function ghReleaseTagExists(version, kit) {
     return __awaiter(this, void 0, void 0, function* () {
-        //try {
-        const req = yield kit.rest.repos.getReleaseByTag({
-            owner: github_1.context.repo.owner,
-            repo: github_1.context.repo.repo,
-            tag: version
-        });
-        if (req.status === 200)
-            return true;
-        else
+        try {
+            core.debug('==> ghReleaseTagExists - begin <==');
+            core.debug(`Repository owner: ${github_1.context.repo.owner}`);
+            core.debug(`Repository name: ${github_1.context.repo.repo}`);
+            core.debug(`Version tag: ${version}`);
+            const req = yield kit.rest.repos.getReleaseByTag({
+                owner: github_1.context.repo.owner,
+                repo: github_1.context.repo.repo,
+                tag: version
+            });
+            core.debug(`Request status: ${req.status}`);
+            core.debug('==> ghReleaseTagExists - end <==');
+            if (req.status === 200)
+                return true;
+            else
+                return false;
+        }
+        catch (_) {
             return false;
-        /*} catch (_) {
-            return false
-        }*/
+        }
     });
 }
 exports.ghReleaseTagExists = ghReleaseTagExists;
