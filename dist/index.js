@@ -362,7 +362,7 @@ exports.parseVersion = parseVersion;
 function getLatestCratesIoVersion(name) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const response = yield axios_1.default.get(`https://crates.io/${name}/versions`);
+            const response = yield axios_1.default.get(`https://crates.io/api/v1/crates/${name}/versions`);
             const versions = response.data.versions.filter(v => !v.yanked);
             if (versions.length > 0) {
                 return versions[0].num;

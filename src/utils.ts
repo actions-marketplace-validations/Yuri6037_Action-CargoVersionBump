@@ -106,7 +106,7 @@ export async function getLatestCratesIoVersion(
 ): Promise<string | null> {
     try {
         const response = await axios.get<CratesIo>(
-            `https://crates.io/${name}/versions`
+            `https://crates.io/api/v1/crates/${name}/versions`
         )
         const versions = response.data.versions.filter(v => !v.yanked)
         if (versions.length > 0) {
