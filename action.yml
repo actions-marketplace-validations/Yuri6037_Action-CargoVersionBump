@@ -26,11 +26,11 @@ outputs:
     description: 'crate name'
   version:
     description: 'crate version'
-  is-new:
+  isnew:
     description: 'true if the version is greater than the latest on crates.io'
   branch:
     description: 'the source branch of the Pull Request'
-  is-pre:
+  ispre:
     description: 'the release is a pre-release'
 runs:
   using: 'node16'

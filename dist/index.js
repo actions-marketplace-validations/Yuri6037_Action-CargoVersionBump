@@ -58,8 +58,8 @@ function run() {
                 const res = yield (0, tool_1.get)(cargo, github);
                 core.setOutput('name', res.name);
                 core.setOutput('version', res.version);
-                core.setOutput('is-new', res.isNew);
-                core.setOutput('is-pre', res.isPre);
+                core.setOutput('isnew', res.isNew);
+                core.setOutput('ispre', res.isPre);
             }
             else if (mode === 'set') {
                 const multi = core.getBooleanInput('multi');

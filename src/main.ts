@@ -18,8 +18,8 @@ async function run(): Promise<void> {
             const res = await get(cargo, github)
             core.setOutput('name', res.name)
             core.setOutput('version', res.version)
-            core.setOutput('is-new', res.isNew)
-            core.setOutput('is-pre', res.isPre)
+            core.setOutput('isnew', res.isNew)
+            core.setOutput('ispre', res.isPre)
         } else if (mode === 'set') {
             const multi = core.getBooleanInput('multi')
             const branch = core.getInput('release-branch')
