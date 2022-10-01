@@ -373,20 +373,19 @@ function getLatestCratesIoVersion(name) {
 exports.getLatestCratesIoVersion = getLatestCratesIoVersion;
 function ghReleaseTagExists(version, kit) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const req = yield kit.rest.repos.getReleaseByTag({
-                owner: github_1.context.repo.owner,
-                repo: github_1.context.repo.repo,
-                tag: version
-            });
-            if (req.status === 200)
-                return true;
-            else
-                return false;
-        }
-        catch (_) {
+        //try {
+        const req = yield kit.rest.repos.getReleaseByTag({
+            owner: github_1.context.repo.owner,
+            repo: github_1.context.repo.repo,
+            tag: version
+        });
+        if (req.status === 200)
+            return true;
+        else
             return false;
-        }
+        /*} catch (_) {
+            return false
+        }*/
     });
 }
 exports.ghReleaseTagExists = ghReleaseTagExists;
